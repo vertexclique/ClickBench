@@ -3,6 +3,7 @@ set -euo pipefail
 
 BENCH_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# The compiled-query cache sits inside the data directory but is derived from
-# the queries, not from the data.
-du -sb --exclude=scramvm_cache "$BENCH_DIR/db" | cut -f1
+# The store the config names (a reload may point it away from db); the compiled-query
+# cache inside it is derived from the queries, not the data.
+DB="$(sed -nE 's/^basedir = "(.*)"/\1/p' "$BENCH_DIR/scramdb-config.toml" 2>/dev/null || true)"
+du -sb --exclude=scramvm_cache "${DB:-$BENCH_DIR/db}" | cut -f1
